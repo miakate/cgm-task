@@ -1,0 +1,77 @@
+<div class="p-6 max-w-screen-2xl mx-auto">
+  <button
+    (click)="goBack()"
+    class="flex items-center text-white text-base hover:underline hover:text-secondary mb-4"
+    aria-label="Back to repositories"
+  >
+    <svg
+      class="w-5 h-5 mr-2"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+    </svg>
+    Back to Repos
+  </button>
+
+  <h1 class="text-3xl font-bold text-white pb-5">Commits</h1>
+
+  <div class="mb-5 mt-5">
+    <input
+      type="text"
+      [formControl]="searchControl"
+      class="w-full border p-2 text-base"
+      placeholder="Search by author or message"
+    />
+  </div>
+  <div class="relative overflow-x-auto shadow-md" *ngIf="filteredCommits() as commitList">
+    <table class="w-full text-base text-left text-gray-500">
+      <thead class="text-base text-white uppercase bg-gray-700">
+        <tr>
+          <th (click)="sortBy('author')" class="px-6 py-3 cursor-pointer hover:underline">
+            Author
+          </th>
+          <th
+            (click)="sortBy('date')"
+            class="px-6 py-3 cursor-pointer hover:underline min-w-[140px]"
+          >
+            Date
+          </th>
+          <th class="px-6 py-3">Message</th>
+          <th class="px-6 py-3">Link</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (commit of commitList; track commit) {
+          <tr class="bg-primary/75 border-b text-white hover:bg-gray-600 cursor-pointer0">
+            <td class="px-6 py-4 font-medium w-1/5 whitespace-nowrap">
+              {{ commit.commit.author.name || 'Unknown' }}
+            </td>
+            <td class="px-6 py-4 w-1/6">
+              {{ commit.commit.author.date | date: 'short' }}
+            </td>
+            <td class="px-6 py-4">
+              {{ commit.commit.message }}
+            </td>
+            <td class="px-6 py-4">
+              <a
+                [href]="commit.html_url"
+                target="_blank"
+                class="text-white text-base hover:underline"
+              >
+                View
+              </a>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="filteredCommits()?.length === 0" class="text-center text-gray-500">
+    No matching commits.
+  </p>
+</div>

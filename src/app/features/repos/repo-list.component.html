@@ -1,0 +1,85 @@
+<div class="p-6 max-w-screen-2xl mx-auto space-y-4">
+  <h1 class="text-3xl font-bold text-white text-center pb-5">Repositories on Github</h1>
+  <div class="flex flex-col sm:flex-row gap-4">
+    <input
+      type="text"
+      [formControl]="searchControl"
+      class="flex-1 p-2 border text-base"
+      placeholder="🔍 Search repository name"
+    />
+
+    <input
+      type="text"
+      [formControl]="languageControl"
+      class="flex-1 p-2 border text-base"
+      placeholder="Language (e.g. javascript)"
+    />
+
+    <input
+      type="number"
+      min="0"
+      [formControl]="starsControl"
+      class="flex-1 p-2 border text-base"
+      placeholder=" Min stars"
+    />
+  </div>
+  <div class="relative overflow-x-auto shadow-xl" *ngIf="repos()?.items as repoList">
+    <table class="w-full text-base text-left text-white">
+      <thead class="text-base text-white uppercase bg-gray-700">
+        <tr>
+          <th (click)="sortBy('name')" class="px-6 py-3 cursor-pointer hover:underline">
+            Repository
+            @if (sortField === 'name') {
+              <span>
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            }
+          </th>
+          <th (click)="sortBy('owner')" class="px-6 py-3 cursor-pointer hover:underline">
+            Owner
+            @if (sortField === 'owner') {
+              <span>
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            }
+          </th>
+          <th (click)="sortBy('created_at')" class="px-6 py-3 cursor-pointer hover:underline">
+            Created At
+            @if (sortField === 'created_at') {
+              <span>
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            }
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (repo of sortedRepos(repoList); track repo.id) {
+          <tr
+            (click)="navigateToCommits(repo)"
+            class="bg-primary/75 border-b hover:bg-gray-600 cursor-pointer"
+          >
+            <td class="px-6 py-4 font-medium text-white">
+              {{ repo.name }}
+            </td>
+            <td class="px-6 py-4 flex items-center gap-3">
+              <img
+                [src]="repo.owner.avatar_url"
+                [alt]="repo.owner.login"
+                class="w-8 h-8 rounded-full border"
+              />
+              <span>{{ repo.owner.login }}</span>
+            </td>
+            <td class="px-6 py-4">
+              {{ repo.created_at | date: 'mediumDate' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="repos()?.items?.length === 0" class="text-center text-gray-500 italic">
+    No repositories found.
+  </p>
+</div>
