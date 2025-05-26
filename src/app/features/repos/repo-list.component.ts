@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import {
   catchError,
@@ -8,6 +8,7 @@ import {
   of,
   startWith,
   switchMap,
+  tap,
 } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { GithubService } from '../../core/services/github.service';
@@ -32,6 +33,7 @@ export class RepoListComponent {
 
   sortField: 'name' | 'owner' | 'created_at' = 'name';
   sortDirection: 'asc' | 'desc' = 'asc';
+  readonly isLoading = signal(true);
 
   sortBy(field: 'name' | 'owner' | 'created_at') {
     if (this.sortField === field) {
@@ -61,15 +63,20 @@ export class RepoListComponent {
       this.languageControl.valueChanges.pipe(startWith(this.languageControl.value ?? '')),
       this.starsControl.valueChanges.pipe(startWith(this.starsControl.value ?? '')),
     ]).pipe(
+      tap(() => this.isLoading.set(true)),
       switchMap(([query, language, stars]) => {
         const safeQuery = query ?? '';
         const safeLanguage = language?.trim() || undefined;
         const safeStars =
           stars !== null && stars.trim() !== '' && !isNaN(+stars) ? +stars : undefined;
 
-        return this.#githubService
-          .searchRepositories(safeQuery, safeLanguage, safeStars)
-          .pipe(catchError(() => of({ items: [] })));
+        return this.#githubService.searchRepositories(safeQuery, safeLanguage, safeStars).pipe(
+          tap(() => this.isLoading.set(false)),
+          catchError(() => {
+            this.isLoading.set(false);
+            return of({ items: [] });
+          })
+        );
       })
     )
   );
