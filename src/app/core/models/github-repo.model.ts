@@ -21,6 +21,7 @@ export interface GithubOwner {
   avatar_url: string;
   html_url: string;
 }
+
 export interface GithubCommit {
   sha: string;
   html_url: string;

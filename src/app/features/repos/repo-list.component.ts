@@ -33,6 +33,7 @@ export class RepoListComponent {
 
   sortField: 'name' | 'owner' | 'created_at' = 'name';
   sortDirection: 'asc' | 'desc' = 'asc';
+
   readonly isLoading = signal(true);
 
   sortBy(field: 'name' | 'owner' | 'created_at') {
